@@ -1,11 +1,15 @@
 /**
  * worker.js — Cloudflare Worker para InefableBot CRM (Versión GAS Gratis)
  */
-// Hardcoded Config (To avoid environment variable issues in Cloudflare)
+
+// ══════════════════════════════════════════════
+// CONFIGURACIÓN — Opción A: Hardcoded (más fácil)
+// Completá estos valores si los secrets de Cloudflare no están configurados
+// ══════════════════════════════════════════════
 const CONFIG = {
-  OPENROUTER_API_KEY: "",
-  GAS_WEBAPP_URL: "",
-  GAS_TOKEN: ""
+  OPENROUTER_API_KEY: "",  // ← pegá tu key de OpenRouter aquí si no usás secrets
+  GAS_WEBAPP_URL: "",      // ← URL de tu Google Apps Script Web App
+  GAS_TOKEN: "todolopuedoencristoquemefortalece"  // ← debe coincidir con APP_TOKEN en el .gs
 };
 
 const CORS_HEADERS = {
@@ -20,24 +24,31 @@ export default {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
     }
 
+    // Opción B: leer desde Cloudflare Secrets (tienen prioridad sobre CONFIG hardcodeado)
+    const cfg = {
+      OPENROUTER_API_KEY: env.OPENROUTER_API_KEY || CONFIG.OPENROUTER_API_KEY,
+      GAS_WEBAPP_URL:     env.GAS_WEBAPP_URL     || CONFIG.GAS_WEBAPP_URL,
+      GAS_TOKEN:          env.GAS_TOKEN          || CONFIG.GAS_TOKEN,
+    };
+
     const url = new URL(request.url);
     const path = url.pathname;
 
     try {
       if (path === '/list-tabs' && request.method === 'GET') {
-        const result = await talkToGAS(CONFIG, { action: 'listTabs' });
+        const result = await talkToGAS(cfg, { action: 'listTabs' });
         return jsonResponse(result);
       }
 
       if (path === '/leer-datos' && request.method === 'GET') {
         const tab = url.searchParams.get('tab') || '';
-        const result = await talkToGAS(CONFIG, { action: 'readData', tab });
+        const result = await talkToGAS(cfg, { action: 'readData', tab });
         return jsonResponse(result);
       }
 
       if (path === '/actualizar-celda' && request.method === 'POST') {
         const body = await request.json();
-        const result = await talkToGAS(CONFIG, {
+        const result = await talkToGAS(cfg, {
           action: 'updateCell',
           fila: body.fila,
           columna: body.columna,
@@ -49,7 +60,7 @@ export default {
 
       if (path === '/chat' && request.method === 'POST') {
         const body = await request.json();
-        const result = await procesarChat(CONFIG, body.messages, body.headers);
+        const result = await procesarChat(cfg, body.messages, body.headers, body.data || []);
         return jsonResponse(result);
       }
 
@@ -83,12 +94,35 @@ async function talkToGAS(config, payload) {
    CHAT CON IA (OpenRouter)
 ══════════════════════════════════════ */
 
-async function procesarChat(config, messages, headers = []) {
-  const systemPrompt = `Sos InefableBot, un asistente de CRM inteligente.
-Tenés acceso a un Google Sheet con las siguientes columnas: ${headers.join(', ')}.
-Podés leer datos, responder preguntas sobre los clientes y editar celdas usando la herramienta "editar_cliente".
-Respondé siempre en español, de forma clara y concisa.
-Cuando necesites editar algo, usá la herramienta. Cuando solo necesites responder, hacelo directamente.`;
+async function procesarChat(config, messages, headers = [], sheetData = []) {
+
+  // Serializar los datos del sheet para incluirlos en el contexto de la IA
+  let dataContext = '';
+  if (sheetData && sheetData.length > 0) {
+    const MAX_ROWS = 200; // límite para no explotar el contexto
+    const rows = sheetData.slice(0, MAX_ROWS);
+    const lines = rows.map((row, i) => {
+      const fields = headers.map(h => `${h}: "${row[h] ?? ''}"`).join(' | ');
+      return `Fila ${i + 1}: ${fields}`;
+    });
+    dataContext = `\n\nDATOS ACTUALES DEL SHEET (${rows.length} registros):\n${lines.join('\n')}`;
+    if (sheetData.length > MAX_ROWS) {
+      dataContext += `\n... (y ${sheetData.length - MAX_ROWS} registros más)`;
+    }
+  }
+
+  const systemPrompt = `Sos InefableBot, un asistente de CRM inteligente para el negocio de eventos "Inefable".
+Tenés acceso COMPLETO al Google Sheet con las siguientes columnas: ${headers.join(', ')}.
+${dataContext}
+
+INSTRUCCIONES IMPORTANTES:
+- Podés buscar clientes por nombre, fecha, teléfono o cualquier campo directamente con los datos de arriba.
+- Cuando alguien pregunta por una fecha (ej: "16/05", "16 de mayo"), buscá en la columna de fechas de los datos.
+- Para buscar, simplemente leé los datos del contexto y respondé. No necesitás ninguna herramienta para buscar.
+- Para EDITAR una celda, usá la herramienta "editar_cliente" con el número de fila exacto.
+- Respondé siempre en español, de forma clara, amigable y concisa.
+- Si encontrás varios resultados, mostralos todos.
+- Si no encontrás resultados, decilo claramente.`;
 
   const tools = [
     {
@@ -99,9 +133,9 @@ Cuando necesites editar algo, usá la herramienta. Cuando solo necesites respond
         parameters: {
           type: 'object',
           properties: {
-            fila: { type: 'number', description: 'Fila del cliente (1 = primer cliente)' },
+            fila: { type: 'number', description: 'Número de fila del cliente según los datos del sheet (Fila 1 = primer registro)' },
             columna: { type: 'string', description: `Columna a editar. Opciones: ${headers.join(', ')}` },
-            nuevo_valor: { type: 'string', description: 'El nuevo valor' }
+            nuevo_valor: { type: 'string', description: 'El nuevo valor a escribir' }
           },
           required: ['fila', 'columna', 'nuevo_valor']
         }
