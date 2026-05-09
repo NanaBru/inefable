@@ -361,6 +361,25 @@ const UI = {
 
   hideEditToast() {
     document.getElementById('edit-toast').style.display = 'none';
+  },
+
+  /* ═══════════════════════════
+     TEMA CLARO / OSCURO
+  ═══════════════════════════ */
+
+  toggleTheme() {
+    const html = document.documentElement;
+    const isLight = html.getAttribute('data-theme') === 'light';
+
+    if (isLight) {
+      html.removeAttribute('data-theme');
+      localStorage.setItem('inefable-theme', 'dark');
+      this.showToast('🌙 Modo oscuro activado', 'info');
+    } else {
+      html.setAttribute('data-theme', 'light');
+      localStorage.setItem('inefable-theme', 'light');
+      this.showToast('☀️ Modo claro activado', 'info');
+    }
   }
 };
 
