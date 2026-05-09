@@ -1,0 +1,22 @@
+# Secretos (Crítico)
+.dev.vars
+.env
+*.env
+*.pem
+*.key
+
+# Dependencias
+node_modules/
+dist/
+.wrangler/
+
+# Datos sensibles / Archivos locales
+*.xlsx
+*.csv
+*.log
+
+# Archivos del Sistema
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

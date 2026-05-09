@@ -1,0 +1,12 @@
+name = "inefablebot-worker"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Variables de entorno: configurarlas en el dashboard de Cloudflare
+# Cloudflare Dashboard → Workers → inefablebot-worker → Settings → Variables
+# NO pongas secretos directamente acá
+
+# Para desarrollo local, creá un archivo .dev.vars con:
+# OPENROUTER_API_KEY = "sk-or-..."
+# GOOGLE_JSON_CREDS = '{"type":"service_account",...}'
+# SHEET_ID = "tu_id_del_sheet"

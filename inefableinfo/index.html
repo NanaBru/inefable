@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inefable — Fotografía</title>
+  <meta property="og:title" content="Inefable — Fotografía" />
+  <meta property="og:description" content="Capturando momentos que no tienen palabras." />
+  <meta property="og:image" content="img/fondo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:   #f5f0ea;
+      --gold:    #c9a96e;
+      --dark:    #1a1610;
+      --glass:   rgba(26, 22, 16, 0.55);
+      --radius:  14px;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Lato', sans-serif;
+      background: var(--dark);
+      color: var(--cream);
+      overflow-x: hidden;
+    }
+
+    /* ── FONDO ── */
+    .bg {
+      position: fixed;
+      inset: 0;
+      background: url('img/fondo.png') center center / cover no-repeat;
+      z-index: 0;
+    }
+    .bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(26,22,16,0.38) 0%,
+        rgba(26,22,16,0.60) 55%,
+        rgba(26,22,16,0.85) 100%
+      );
+    }
+
+    /* ── LAYOUT ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 36px 20px 48px;
+      gap: 0;
+    }
+
+    /* ── LOGO ── */
+    .logo-wrap {
+      width: 100%;
+      max-width: 280px;
+      margin-bottom: 28px;
+    }
+    .logo-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 2px 18px rgba(201,169,110,0.25));
+    }
+
+    /* ── VIDEO ── */
+    .video-shell {
+      width: 100%;
+      max-width: 560px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.55);
+      border: 1px solid rgba(201,169,110,0.22);
+      background: #000;
+      aspect-ratio: 16/9;
+    }
+    .video-shell iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: none;
+    }
+
+    /* ── TAGLINE ── */
+    .tagline {
+      margin-top: 22px;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(1.05rem, 3.5vw, 1.3rem);
+      color: rgba(245,240,234,0.75);
+      letter-spacing: 0.04em;
+      text-align: center;
+    }
+
+    /* ── BOTONES ── */
+    .btns {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 15px 24px;
+      border-radius: 50px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { transform: scale(0.97); }
+
+    /* Instagram */
+    .btn-ig {
+      background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(220,39,67,0.35);
+    }
+    .btn-ig:hover { opacity: 0.9; box-shadow: 0 6px 30px rgba(220,39,67,0.45); }
+
+    /* WhatsApp */
+    .btn-wa {
+      background: #25D366;
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(37,211,102,0.30);
+    }
+    .btn-wa:hover { opacity: 0.9; box-shadow: 0 6px 30px rgba(37,211,102,0.42); }
+
+    /* Descarga */
+    .btn-dl {
+      background: transparent;
+      color: var(--gold);
+      border: 1.5px solid var(--gold);
+      box-shadow: 0 2px 14px rgba(201,169,110,0.12);
+    }
+    .btn-dl:hover { background: rgba(201,169,110,0.10); box-shadow: 0 4px 20px rgba(201,169,110,0.22); }
+
+    /* Compartir */
+    .btn-share {
+      background: var(--glass);
+      color: var(--cream);
+      border: 1.5px solid rgba(245,240,234,0.20);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .btn-share:hover { background: rgba(26,22,16,0.75); }
+
+    /* ── ICONOS SVG inline ── */
+    .icon { width: 20px; height: 20px; flex-shrink: 0; fill: currentColor; }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 36px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      color: rgba(245,240,234,0.30);
+      text-transform: uppercase;
+    }
+
+    /* ── RESPONSIVE AJUSTES ── */
+    @media (max-width: 400px) {
+      .logo-wrap { max-width: 220px; }
+      .btn { font-size: 0.88rem; padding: 13px 20px; }
+    }
+    @media (min-width: 640px) {
+      .btns { flex-direction: row; flex-wrap: wrap; max-width: 520px; }
+      .btn { width: auto; flex: 1 1 45%; }
+      .btn-share, .btn-dl { flex: 1 1 45%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg"></div>
+
+  <main class="page">
+
+    <!-- LOGO -->
+    <div class="logo-wrap">
+      <img src="img/logo.png" alt="Inefable Fotografía" />
+    </div>
+
+    <div class="video-shell">
+      <iframe
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ"
+        title="Inefable — Video"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    </div>
+
+    <!-- TAGLINE -->
+    <p class="tagline">Capturando lo que las palabras no pueden decir.</p>
+
+    <!-- BOTONES -->
+    <div class="btns">
+
+      <!-- Instagram -->
+      <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="btn btn-ig" aria-label="Seguir en Instagram">
+        <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.975.975 1.246 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.975.975-2.242 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.975-.975-1.246-2.242-1.308-3.608C2.175 15.584 2.163 15.204 2.163 12s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608C4.516 2.497 5.783 2.225 7.15 2.163 8.416 2.105 8.796 2.163 12 2.163zm0-2.163C8.741 0 8.333.014 7.053.072 5.197.157 3.355.673 2.014 2.014.673 3.355.157 5.197.072 7.053.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.085 1.856.601 3.698 1.942 5.038 1.341 1.341 3.183 1.857 5.038 1.942C8.333 23.986 8.741 24 12 24s3.668-.014 4.948-.072c1.856-.085 3.698-.601 5.038-1.942 1.341-1.341 1.857-3.183 1.942-5.038.058-1.28.072-1.689.072-4.948 0-3.259-.014-3.667-.072-4.947-.085-1.856-.601-3.698-1.942-5.038C20.646.673 18.804.157 16.948.072 15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+        </svg>
+        Instagram
+      </a>
+
+      <!-- WhatsApp — REEMPLAZAR NÚMERO -->
+      <a href="https://wa.me/" target="_blank" rel="noopener" class="btn btn-wa" aria-label="Contactar por WhatsApp">
+        <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
+        </svg>
+        WhatsApp
+      </a>
+
+      <!-- Descarga — REEMPLAZAR LINK DRIVE -->
+      <a href="LINK_DE_DRIVE_AQUI" target="_blank" rel="noopener" class="btn btn-dl" aria-label="Descargar">
+        <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2h14v2H5v-2z"/>
+        </svg>
+        Descargar
+      </a>
+
+      <!-- Compartir -->
+      <button class="btn btn-share" onclick="handleShare()" aria-label="Compartir página">
+        <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+        </svg>
+        Compartir
+      </button>
+
+    </div>
+
+    <p class="footer">© Inefable Fotografía</p>
+
+  </main>
+
+  <script>
+    function handleShare() {
+      const shareData = {
+        title: 'Inefable — Fotografía',
+        text: 'Mirá este trabajo de Inefable Fotografía 📸',
+        url: window.location.href,
+      };
+      if (navigator.share) {
+        navigator.share(shareData).catch(() => {});
+      } else {
+        // fallback: copia al portapapeles
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          const btn = document.querySelector('.btn-share');
+          const orig = btn.innerHTML;
+          btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg> ¡Link copiado!`;
+          setTimeout(() => { btn.innerHTML = orig; }, 2200);
+        });
+      }
+    }
+  </script>
+
+</body>
+</html>
